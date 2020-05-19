@@ -24,21 +24,21 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use((err, req, res, next) => {
-  const status = err.message || 500;
-  let message = err.message;
-  if (err.name === 'ValidationError') {
-    return res.status(400).send('valid error');
-  }
+// app.use((err, req, res, next) => {
+//   const status = err.message || 500;
+//   let message = err.message;
+//   if (err.name === 'ValidationError') {
+//     return res.status(400).send('valid error');
+//   }
 
-  if(status == 500) {
-    console.error(err.stack || err);
-    message = 'unexpected error';
-  }
+//   if(status == 500) {
+//     console.error(err.stack || err);
+//     message = 'unexpected error';
+//   }
 
-  res.status(status).send(message);
+//   res.status(status).send(message);
 
-});
+// });
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json()); // для собирания JSON-формата

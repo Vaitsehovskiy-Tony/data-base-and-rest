@@ -14,7 +14,6 @@ const createUser = (req, res) => {
 };
 
 const findUser = (req, res) => {
-
   Users.findById(req.params.id)
     .then((user) => res.send({ data: user }))
     .catch((err) => res.status(404).send({ message: err.message }));
