@@ -24,10 +24,9 @@ const cardSchema = new mongoose.Schema({
 
   },
   likes: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: [mongoose.Schema.Types.ObjectId],
     required: [false, 'Это обязательное поле'],
     ref: 'user',
-    default: [],
   },
   createdAt: {
     type: Date,
