@@ -2,7 +2,13 @@ const cardModel = require('../models/card');
 
 const cardRemove = (req, res) => {
   cardModel.findByIdAndRemove(req.params.id)
-    .then((card) => res.send({ data: card }))
+    .then((card) => {
+      if (card) {
+        res.send({ data: card });
+      } else {
+        res.status(404).send({ message: 'Нет пользователя с таким id' });
+      }
+    })
     .catch((err) => res.status(400).send({ message: err.message }));
 };
 

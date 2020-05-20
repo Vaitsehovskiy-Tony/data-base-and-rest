@@ -1,10 +1,15 @@
+const bodyParser = require('body-parser');
+
 const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
 
+
 const app = express();
 const { PORT = 3000 } = process.env;
-const bodyParser = require('body-parser');
+
+app.use(bodyParser.json()); // для собирания JSON-формата
+app.use(bodyParser.urlencoded({ extended: true })); // для приёма веб-страниц внутри POST-запроса
 
 const routerUsers = require('./routes/users');
 const routerCards = require('./routes/cards');
@@ -14,7 +19,16 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
   useCreateIndex: true,
   useFindAndModify: false,
-});
+  useUnifiedTopology: true,
+})
+  .then(() => {
+    // eslint-disable-next-line no-console
+    console.log('Connected t0 MongoDB');
+  })
+  .catch(() => {
+    // eslint-disable-next-line no-console
+    console.log('Connection error');
+  });
 
 app.use((req, res, next) => {
   req.user = {
@@ -41,8 +55,6 @@ app.use((req, res, next) => {
 // });
 
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(bodyParser.json()); // для собирания JSON-формата
-app.use(bodyParser.urlencoded({ extended: true })); // для приёма веб-страниц внутри POST-запроса
 
 app.use('/users', routerUsers);
 app.use('/cards', routerCards);
