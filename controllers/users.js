@@ -3,7 +3,7 @@ const Users = require('../models/user');
 const getUsers = (req, res) => {
   Users.find({})
     .then((users) => res.send({ data: users }))
-    .catch((err) => res.status(400).send({ message: err.message }));
+    .catch((err) => res.status(500).send({ message: err.message }));
 };
 
 const createUser = (req, res) => {

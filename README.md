@@ -11,10 +11,19 @@ ____
 #### Практическая работа по взаимодействию с Mongo DB и использованию принципов API REST
 
 * запрос на GET /users возвращает всех пользователей из базы;
+  GET http://localhost:3000/users
+
 * запрос GET /users/:userId возвращает конкретного пользователя;
+  GET http://localhost:3000/users/<-ID пользователя->
+
 * запрос POST /users создаёт пользователя;
+  POST http://localhost:3000/users
+
 * запрос GET /cards возвращает все карточки всех пользователей;
+  GET http://localhost:3000/cards
+  
 * запрос POST /cards создаёт карточку;
+  POST http://localhost:3000/cards
 
 ##### Development-сборка собирается командой npm run dev по адресу [localhost](http://localhost:3000/)
 
