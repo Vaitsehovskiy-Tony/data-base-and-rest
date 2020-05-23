@@ -14,5 +14,7 @@ express
 # Optional REPL history
 .DS_Store
 .idea
+.env
+
 
 data

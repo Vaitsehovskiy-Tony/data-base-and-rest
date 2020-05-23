@@ -1,13 +1,26 @@
 const cardModel = require('../models/card');
 
 const cardRemove = (req, res) => {
-  cardModel.findByIdAndRemove(req.params.id)
+  cardModel.findById(req.params.id)
     .then((card) => {
-      if (card) {
-        res.send({ data: card });
-      } else {
-        res.status(404).send({ message: 'Нет карточки с таким id' });
+      const { owner } = card;
+      return owner;
+    })
+    // eslint-disable-next-line consistent-return
+    .then((owner) => {
+      const a = JSON.stringify(owner).slice(1, -1);
+      if (a !== req.user._id) {
+        return Promise.reject(new Error('Недостаточно прав для удаления карточки'));
       }
+      cardModel.findByIdAndRemove(req.params.id)
+        .then((card) => {
+          if (card) {
+            res.send({ data: card });
+          } else {
+            res.status(404).send({ message: 'Нет карточки с таким id' });
+          }
+        })
+        .catch((err) => res.status(400).send({ message: err.message }));
     })
     .catch((err) => res.status(400).send({ message: err.message }));
 };

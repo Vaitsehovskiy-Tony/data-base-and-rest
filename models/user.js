@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const validator = require('validator');
+
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -16,6 +18,20 @@ const userSchema = new mongoose.Schema({
   avatar: {
     type: String,
     required: [true, 'Это обязательное поле'],
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    validate: {
+      validator(v) { return validator.isEmail(v); },
+      message: 'Неверный формат почты',
+    },
+  },
+  password: {
+    type: String,
+    required: true,
+    select: false, // необходимо добавить поле select
   },
 });
 
