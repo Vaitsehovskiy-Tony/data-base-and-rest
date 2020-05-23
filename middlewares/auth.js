@@ -7,7 +7,6 @@ const authError = (res) => {
     .status(401)
     .send({ message: 'Тербуется авторизация' });
 };
-
 const extractBearerToken = (header) => header.replace('Bearer ', '');
 
 // eslint-disable-next-line consistent-return
