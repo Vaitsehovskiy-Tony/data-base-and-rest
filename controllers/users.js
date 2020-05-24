@@ -1,5 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const validator = require('validator');
+
 const Users = require('../models/user');
 
 const { JWT_SECRET } = process.env;
@@ -11,17 +13,28 @@ const getUsers = (req, res) => {
     .catch((err) => res.status(500).send({ message: err.message }));
 };
 
+// eslint-disable-next-line consistent-return
 const createUser = (req, res) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
-  bcrypt.hash(password, 10)
-    .then((hash) => Users.create({
-      name, about, avatar, email, password: hash,
-    }))
-    .then((user) => res.send({ data: user }))
-    .catch((err) => res.status(404).send({ message: err.message }));
+  if (validator.isAlphanumeric(password, ['en-US'])) {
+    bcrypt.hash(password, 10)
+      .then((hash) => Users.create({
+        name, about, avatar, email, password: hash,
+      }))
+      .then((user) => {
+        const userNoPass = user;
+        userNoPass.password = '******';
+        // delete userNoPass.password;
+        res.send({ data: userNoPass });
+      })
+      .catch((err) => res.status(404).send({ message: err.message }));
+  } else {
+    return res.status(400).send('недопустимые символы в пароле, используйте латиницу');
+  }
 };
+
 
 const findUser = (req, res) => {
   Users.findById(req.params.id)
@@ -41,6 +54,7 @@ const login = (req, res, next) => {
 
   Users.findOne({ email }).select('+password')
     .then((u) => {
+      user = u;
       if (!u) {
         return Promise.reject(new Error('Неправильные почта или пароль'));
       }
@@ -51,7 +65,7 @@ const login = (req, res, next) => {
         return Promise.reject(new Error('Неправильные почта или пароль'));
       }
       return jwt.sign(
-        { _id: user._id },
+        { _id: user.id },
         JWT_SECRET,
         { expiresIn: '7d' },
       );

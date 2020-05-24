@@ -34,10 +34,7 @@ const getCards = (req, res) => {
 const createCard = (req, res) => {
   const { name, link } = req.body;
   cardModel.create({ name, link })
-    .then((oneCard) => {
-      delete oneCard.hash;
-      res.send(oneCard)
-    })
+    .then((oneCard) => res.send(oneCard))
     .catch((err) => res.status(400).send({ message: err.message }));
 };
 
