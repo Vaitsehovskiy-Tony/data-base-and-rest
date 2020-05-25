@@ -56,17 +56,17 @@ const login = (req, res, next) => {
     .then((u) => {
       user = u;
       if (!u) {
-        return Promise.reject(new Error('Неправильные почта или пароль'));
+        res.status(401).send({ message: 'Неправильные почта или пароль' });
       }
       return bcrypt.compare(password, u.password);
     })
     .then((matched) => {
       if (!matched) {
-        return Promise.reject(new Error('Неправильные почта или пароль'));
+        res.status(401).send({ message: 'Неправильные почта или пароль' });
       }
       return jwt.sign(
         { _id: user.id },
-        JWT_SECRET,
+        JWT_SECRET || 'dev-key',
         { expiresIn: '7d' },
       );
     })
@@ -74,6 +74,7 @@ const login = (req, res, next) => {
       res.cookie('jwt', token, {
         maxAge: 3600000 * 24 * 7,
         httpOnly: true,
+        sameSite: true,
       });
       res.json({ token });
     })
