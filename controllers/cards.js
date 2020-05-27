@@ -1,11 +1,16 @@
 const cardModel = require('../models/card');
 const ForbiddenError = require('../errors/forbidden-error');
 const NotFoundError = require('../errors/not-found-error');
+const BadRequestError = require('../errors/bad-request-error');
+
 
 const cardRemove = (req, res, next) => {
   cardModel.findById(req.params.id)
     .then((card) => {
       const { owner } = card;
+      if (owner === 'null') {
+        throw new BadRequestError('недопустимые символы, используйте латиницу');
+      }
       return owner;
     })
     // eslint-disable-next-line consistent-return
