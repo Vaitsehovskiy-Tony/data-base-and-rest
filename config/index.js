@@ -1,6 +1,5 @@
 module.exports = {
-  // eslint-disable-next-line radix
-  PORT: parseInt(process.env.PORT) || 3000,
-  // eslint-disable-next-line radix
-  JWT_SECRET: parseInt(process.env.JWT_SECRET) || 'JWT_SECRET',
+  PORT: parseInt(process.env.PORT, 10) || 3000,
+  JWT_SECRET: process.env.JWT_SECRET || 'JWT_SECRET',
+  MONGODB_URL: 'mongodb://localhost:27017/mestodb',
 };

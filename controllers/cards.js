@@ -13,12 +13,11 @@ const cardRemove = (req, res, next) => {
       }
       return owner;
     })
-    // eslint-disable-next-line consistent-return
     .then((owner) => {
-      if (req.user._id !== owner.toSrting()) {
+      if (req.user._id !== owner.toString()) {
         throw new ForbiddenError('Недостаточно прав для удаления карточки');
       }
-      cardModel.findByIdAndRemove(req.params.id)
+      return cardModel.findByIdAndRemove(req.params.id)
         .then((card) => {
           if (card) {
             res.send({ data: card });
@@ -39,7 +38,8 @@ const getCards = (req, res, next) => {
 
 const createCard = (req, res, next) => {
   const { name, link } = req.body;
-  cardModel.create({ name, link })
+  const owner = req.user._id;
+  cardModel.create({ name, link, owner })
     .then((oneCard) => res.send(oneCard))
     .catch(next);
 };

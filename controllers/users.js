@@ -6,7 +6,7 @@ const NotFoundError = require('../errors/not-found-error');
 const UnauthorizedError = require('../errors/unauthorized-error');
 const Users = require('../models/user');
 
-const { JWT_SECRET } = process.env;
+const { NODE_ENV, JWT_SECRET } = require('../config');
 
 const getUsers = (req, res, next) => {
   Users.find({})
@@ -14,7 +14,6 @@ const getUsers = (req, res, next) => {
     .catch(next);
 };
 
-// eslint-disable-next-line consistent-return
 const createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
@@ -67,7 +66,7 @@ const login = (req, res, next) => {
       }
       return jwt.sign(
         { _id: user.id },
-        JWT_SECRET || 'dev-key',
+        NODE_ENV === 'prod' ? JWT_SECRET : 'JWT_SECRET',
         { expiresIn: '7d' },
       );
     })

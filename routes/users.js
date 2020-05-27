@@ -6,7 +6,6 @@ routerUsers.use(requestLogger);
 
 
 routerUsers.get('/', getUsers);
-// routerUsers.post('/', createUser);
 routerUsers.get('/:id', findUser);
 
 routerUsers.use(errorLogger);

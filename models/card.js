@@ -18,12 +18,12 @@ const cardSchema = new mongoose.Schema({
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
-    required: [false, 'Это обязательное поле'],
+    required: [true, 'Это обязательное поле'],
     ref: 'user',
   },
   likes: {
     type: [mongoose.Schema.Types.ObjectId],
-    required: [false, 'Это обязательное поле'],
+    required: [true, 'Это обязательное поле'],
     ref: 'user',
   },
   createdAt: {

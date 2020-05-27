@@ -1,5 +1,6 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable no-console */
-/* eslint-disable consistent-return */
+
 require('dotenv').config();
 const express = require('express');
 
@@ -11,7 +12,7 @@ const rateLimit = require('express-rate-limit');
 const { errors, celebrate } = require('celebrate');
 const mongoose = require('mongoose');
 const path = require('path');
-const { PORT } = require('./config/index');
+const config = require('./config');
 
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 
@@ -20,8 +21,7 @@ const limiter = rateLimit({
   max: 100, // можно совершить максимум 100 запросов с одного IP
 });
 
-// подключаем rate-limiter
-app.use(limiter);
+app.use(limiter);// подключаем rate-limiter
 app.use(helmet());
 app.use(cookieParser());
 app.use(bodyParser.json()); // для собирания JSON-формата
@@ -36,7 +36,7 @@ const { signUpSchema } = require('./schemas/signUpSchema');
 
 
 // подключаемся к серверу mongo
-mongoose.connect('mongodb://localhost:27017/mestodb', {
+mongoose.connect(config.MONGODB_URL, {
   useNewUrlParser: true,
   useCreateIndex: true,
   useFindAndModify: false,
@@ -52,13 +52,13 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(requestLogger);
-
 app.get('/crash-test', () => {
   setTimeout(() => {
     throw new Error('Сервер сейчас упадёт');
   }, 0);
 });
+
+app.use(requestLogger);
 
 app.post('/signup', celebrate(signUpSchema), createUser);
 app.post('/signin', celebrate(signInSchema), login);
@@ -76,7 +76,6 @@ app.use((req, res) => {
   res.status(404).send({ message: 'Запрашиваемый ресурс не найден' });
 });
 
-// eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   const status = err.statusCode || 500;
   let { message } = err;
@@ -87,9 +86,9 @@ app.use((err, req, res, next) => {
     console.error(err.stack || err);
     message = 'unexpected error';
   }
-  res.status(status).send(message);
+  return res.status(status).send({ message });
 });
 
-app.listen(PORT, () => {
-  console.log(`App listening on port ${PORT}`);
+app.listen(config.PORT, () => {
+  console.log(`App listening on port ${config.PORT}`);
 });
