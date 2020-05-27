@@ -1,9 +1,12 @@
 ## data-base-and-rest
 ____
 
-#### Проект: https://vaitsehovskiy-tony.github.io/data-base-and-rest/
+#### Проект доступен по следующим адресам:
+#### 130.193.45.99
+#### http://tony-vaits-mesto.site
+#### https://tony-vaits-mesto.site
 
-#### v0.0.2
+#### v0.0.3
 
 #### Стек технологий: MongoDB, JavaScript, Git, Node.js, API REST
 

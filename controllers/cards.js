@@ -1,6 +1,8 @@
 const cardModel = require('../models/card');
+const ForbiddenError = require('../errors/forbidden-error');
+const NotFoundError = require('../errors/not-found-error');
 
-const cardRemove = (req, res) => {
+const cardRemove = (req, res, next) => {
   cardModel.findById(req.params.id)
     .then((card) => {
       const { owner } = card;
@@ -10,25 +12,25 @@ const cardRemove = (req, res) => {
     .then((owner) => {
       const a = JSON.stringify(owner).slice(1, -1);
       if (a !== req.user._id) {
-        return Promise.reject(new Error('Недостаточно прав для удаления карточки'));
+        throw new ForbiddenError('Недостаточно прав для удаления карточки');
       }
       cardModel.findByIdAndRemove(req.params.id)
         .then((card) => {
           if (card) {
             res.send({ data: card });
           } else {
-            res.status(404).send({ message: 'Нет карточки с таким id' });
+            throw new NotFoundError('Нет карточки с таким id');
           }
         })
-        .catch((err) => res.status(400).send({ message: err.message }));
+        .catch(next);
     })
-    .catch((err) => res.status(400).send({ message: err.message }));
+    .catch(next);
 };
 
-const getCards = (req, res) => {
+const getCards = (req, res, next) => {
   cardModel.find({})
     .then((cards) => res.send({ data: cards }))
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch(next);
 };
 
 const createCard = (req, res) => {
