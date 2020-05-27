@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+/* eslint-disable consistent-return */
 require('dotenv').config();
 const express = require('express');
 
@@ -10,7 +12,6 @@ const { errors, celebrate } = require('celebrate');
 const mongoose = require('mongoose');
 const path = require('path');
 const { PORT } = require('./config/index');
-
 
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 
@@ -42,11 +43,9 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useUnifiedTopology: true,
 })
   .then(() => {
-    // eslint-disable-next-line no-console
     console.log('Connected t0 MongoDB');
   })
   .catch(() => {
-    // eslint-disable-next-line no-console
     console.log('Connection error');
   });
 
@@ -69,34 +68,28 @@ app.use(auth);
 app.use('/users', routerUsers);
 app.use('/cards', routerCards);
 
-app.use(errorLogger); // подключаем логгер ошибок
+app.use(errorLogger);
 
-app.use(errors()); // обработчик ошибок celebrate
+app.use(errors());
 
 app.use((req, res) => {
   res.status(404).send({ message: 'Запрашиваемый ресурс не найден' });
 });
 
+// eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
-  // если у ошибки нет статуса, выставляем 500
-  const status = err.status || 500;
-  const { message } = err;
-  if (err.status === '401' || err.joi) {
-    return res.status(401).send(`validation error; ${err.massage}`);
+  const status = err.statusCode || 500;
+  let { message } = err;
+  if (err.name === 'ValidationError' || err.joi) {
+    return res.status(400).send(`validation error: ${err.massage}`);
   }
-  if (err.status === '403' || err.joi) {
-    return res.status(403).send(`validation error; ${err.massage}`);
+  if (status === 500) {
+    console.error(err.stack || err);
+    message = 'unexpected error';
   }
-  if (err.status === '404' || err.joi) {
-    return res.status(404).send(`validation error; ${err.massage}`);
-  }
-  if (err.status === '400' || err.joi) {
-    return res.status(400).send(`validation error; ${err.massage}`);
-  }
-  res.status(status).send({ message });
+  res.status(status).send(message);
 });
 
 app.listen(PORT, () => {
-  // eslint-disable-next-line no-console
   console.log(`App listening on port ${PORT}`);
 });

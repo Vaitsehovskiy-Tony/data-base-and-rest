@@ -33,11 +33,11 @@ const getCards = (req, res, next) => {
     .catch(next);
 };
 
-const createCard = (req, res) => {
+const createCard = (req, res, next) => {
   const { name, link } = req.body;
   cardModel.create({ name, link })
     .then((oneCard) => res.send(oneCard))
-    .catch((err) => res.status(400).send({ message: err.message }));
+    .catch(next);
 };
 
 module.exports = {
