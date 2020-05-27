@@ -10,8 +10,7 @@ const cardRemove = (req, res, next) => {
     })
     // eslint-disable-next-line consistent-return
     .then((owner) => {
-      const a = JSON.stringify(owner).slice(1, -1);
-      if (a !== req.user._id) {
+      if (req.user._id !== owner.toSrting()) {
         throw new ForbiddenError('Недостаточно прав для удаления карточки');
       }
       cardModel.findByIdAndRemove(req.params.id)
