@@ -1,3 +1,5 @@
+/* eslint-disable arrow-parens */
+/* eslint-disable no-unused-vars */
 const cardModel = require('../models/card');
 const ForbiddenError = require('../errors/forbidden-error');
 const NotFoundError = require('../errors/not-found-error');
@@ -26,6 +28,9 @@ const cardRemove = (req, res, next) => {
           }
         })
         .catch(next);
+    })
+    .catch(err => {
+      throw new NotFoundError('Нет карточки с таким id');
     })
     .catch(next);
 };

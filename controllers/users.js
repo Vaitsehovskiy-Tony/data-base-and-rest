@@ -6,7 +6,9 @@ const NotFoundError = require('../errors/not-found-error');
 const UnauthorizedError = require('../errors/unauthorized-error');
 const Users = require('../models/user');
 
-const { NODE_ENV, JWT_SECRET } = require('../config');
+// const { NODE_ENV, JWT_SECRET } = require('../config');
+const { JWT_SECRET } = require('../config');
+
 
 const getUsers = (req, res, next) => {
   Users.find({})
@@ -18,21 +20,21 @@ const createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
-  if (!validator.isAlphanumeric(password, ['en-US'])) {
-    throw new BadRequestError('недопустимые символы в пароле, используйте латиницу');
-  } else {
-    bcrypt.hash(password, 10)
-      .then((hash) => Users.create({
-        name, about, avatar, email, password: hash,
-      }))
-      .then((user) => {
-        const userNoPass = user;
-        userNoPass.password = '******';
-        res.send({ data: userNoPass });
-      })
-      .catch(next);
-  }
+  // if (!validator.matches(password, [/\s/])) {
+  //   throw new BadRequestError('Пробелы недопустимы в пароле');
+  // } else {
+  bcrypt.hash(password, 10)
+    .then((hash) => Users.create({
+      name, about, avatar, email, password: hash,
+    }))
+    .then((user) => {
+      const userNoPass = user;
+      userNoPass.password = '******';
+      res.send({ data: userNoPass });
+    })
+    .catch(next);
 };
+// };
 
 
 const findUser = (req, res, next) => {
@@ -69,7 +71,7 @@ const login = (req, res, next) => {
       }
       return jwt.sign(
         { _id: user.id },
-        NODE_ENV === 'prod' ? JWT_SECRET : 'JWT_SECRET',
+        JWT_SECRET,
         { expiresIn: '7d' },
       );
     })

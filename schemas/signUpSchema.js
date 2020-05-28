@@ -17,7 +17,7 @@ module.exports.signUpSchema = {
       .required()
       .email({ minDomainSegments: 2 }),
     password: Joi.string()
-      .regex(/\S/)
+      .regex(/^[-_!@#%{}a-zA-Z0-9\]\[\\\?\^\$\.\|\*\+\)\(]{8,30}$/)
       .required()
       .min(6),
   }).unknown(true),
