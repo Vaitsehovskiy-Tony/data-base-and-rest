@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 const { Joi } = require('celebrate');
 
 module.exports.signInSchema = {
@@ -7,7 +8,7 @@ module.exports.signInSchema = {
       .lowercase()
       .email({ minDomainSegments: 2 }),
     password: Joi.string()
-      .alphanum()
+      .regex(/^[-_!@#%{}a-zA-Z0-9\]\[\\\?\^\$\.\|\*\+\)\(]{8,30}$/)
       .required()
       .min(6),
   }),
