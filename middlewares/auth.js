@@ -9,8 +9,10 @@ module.exports = (req, res, next) => {
 
   try {
     const SECRET = NODE_ENV === 'prod' ? JWT_SECRET : 'JWT_SECRET';
-    payload = jwt.verify(token, SECRET);
+    console.log(SECRET);
+    payload = jwt.verify(token, JWT_SECRET);
   } catch (err) {
+    console.log(err);
     throw new UnauthorizedError('Требуется авторизация');
   }
 

@@ -47,9 +47,13 @@ const findUser = (req, res, next) => {
     .catch(next);
 };
 
+
 const login = (req, res, next) => {
   const { email, password } = req.body;
   let user;
+
+  console.log(JWT_SECRET);
+
 
   Users.findOne({ email }).select('+password')
     .then((u) => {
