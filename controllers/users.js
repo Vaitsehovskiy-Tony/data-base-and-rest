@@ -18,7 +18,9 @@ const createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
-  if (validator.isAlphanumeric(password, ['en-US'])) {
+  if (!validator.isAlphanumeric(password, ['en-US'])) {
+    throw new BadRequestError('недопустимые символы в пароле, используйте латиницу');
+  } else {
     bcrypt.hash(password, 10)
       .then((hash) => Users.create({
         name, about, avatar, email, password: hash,
@@ -28,9 +30,6 @@ const createUser = (req, res, next) => {
         userNoPass.password = '******';
         res.send({ data: userNoPass });
       })
-      .catch(next);
-  } else {
-    throw new BadRequestError('недопустимые символы в пароле, используйте латиницу')
       .catch(next);
   }
 };
