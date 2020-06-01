@@ -1,72 +1,77 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const validator = require('validator');
-
+const BadRequestError = require('../errors/bad-request-error');
+const NotFoundError = require('../errors/not-found-error');
+const UnauthorizedError = require('../errors/unauthorized-error');
 const Users = require('../models/user');
 
-const { JWT_SECRET } = process.env;
+// const { NODE_ENV, JWT_SECRET } = require('../config');
+const { JWT_SECRET } = require('../config');
 
 
-const getUsers = (req, res) => {
+const getUsers = (req, res, next) => {
   Users.find({})
     .then((users) => res.send({ data: users }))
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch(next);
 };
 
-// eslint-disable-next-line consistent-return
-const createUser = (req, res) => {
+const createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
-  if (validator.isAlphanumeric(password, ['en-US'])) {
-    bcrypt.hash(password, 10)
-      .then((hash) => Users.create({
-        name, about, avatar, email, password: hash,
-      }))
-      .then((user) => {
-        const userNoPass = user;
-        userNoPass.password = '******';
-        // delete userNoPass.password;
-        res.send({ data: userNoPass });
-      })
-      .catch((err) => res.status(404).send({ message: err.message }));
-  } else {
-    return res.status(400).send('недопустимые символы в пароле, используйте латиницу');
-  }
+  // if (!validator.matches(password, [/\s/])) {
+  //   throw new BadRequestError('Пробелы недопустимы в пароле');
+  // } else {
+  bcrypt.hash(password, 10)
+    .then((hash) => Users.create({
+      name, about, avatar, email, password: hash,
+    }))
+    .then((user) => {
+      const userNoPass = user;
+      userNoPass.password = '******';
+      res.send({ data: userNoPass });
+    })
+    .catch(next);
 };
+// };
 
 
-const findUser = (req, res) => {
+const findUser = (req, res, next) => {
   Users.findById(req.params.id)
     .then((user) => {
       if (user) {
         res.send({ data: user });
       } else {
-        res.status(404).send({ message: 'Нет пользователя с таким id' });
+        throw new NotFoundError('Нет пользователя с таким id');
       }
     })
-    .catch((err) => res.status(404).send({ message: err.message }));
+    .catch(next);
 };
+
 
 const login = (req, res, next) => {
   const { email, password } = req.body;
   let user;
 
+  console.log(JWT_SECRET);
+
+
   Users.findOne({ email }).select('+password')
     .then((u) => {
       user = u;
       if (!u) {
-        res.status(401).send({ message: 'Неправильные почта или пароль' });
+        throw new UnauthorizedError('Неправильные почта или пароль');
       }
       return bcrypt.compare(password, u.password);
     })
     .then((matched) => {
       if (!matched) {
-        res.status(401).send({ message: 'Неправильные почта или пароль' });
+        throw new UnauthorizedError('Неправильные почта или пароль');
       }
       return jwt.sign(
         { _id: user.id },
-        JWT_SECRET || 'dev-key',
+        JWT_SECRET,
         { expiresIn: '7d' },
       );
     })
